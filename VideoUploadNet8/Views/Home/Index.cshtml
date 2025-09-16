@@ -1,0 +1,74 @@
+﻿@model List<VideoFile>
+@{
+    ViewData["Title"] = "Video Upload & Catalog";
+}
+<div class="container">
+    <h3>Upload MP4 Files</h3>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div class="row">
+
+            <div id="uploadResult"></div>
+            <div class="col-10">
+                <input class="form-control" type="file" id="formFileMultiple" name="files" multiple accept=".mp4">
+
+            </div>
+            <div class="col-2">
+                <button type="submit" class="btn btn-dark">Upload</button>
+            </div>
+        </div>
+
+    </form>
+
+    <hr />
+
+    <h2>Catalogue</h2>
+    <table class="table table-hover">
+        <thead>
+            <tr> <th>#</th> <th>Filename</th><th>Size (MB)</th></tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var file = Model[i];
+                <tr data-index="@i" onclick="openVideoModal(@i)">
+                    <td>@(i + 1)</td>
+                    <td>@file.FileName</td>
+                    <td>@(file.FileSize / (1024 * 1024))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @* 
+<video id="player" width="600" height="400" controls style="display:none; margin-top: 20px;"></video>
+ *@
+    <!-- Video Modal -->
+    <div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center mb-0" id="videoTitle" style="flex-grow: 1;">Video Playback</h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="pauseVideo()"></button>
+                </div>
+                <div class="modal-body text-center position-relative">
+
+                    <button type="button" class="btn btn-light position-absolute top-50 start-0 translate-middle-y" onclick="navigateVideo(-1)">
+                        &#8592;
+                    </button>
+                    <video id="popupVideo" width="100%" height="auto" controls>
+                        <source src="" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button type="button" class="btn btn-light position-absolute top-50 end-0 translate-middle-y" onclick="navigateVideo(1)">
+                        &#8594;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/Upload.js"></script>
+<script>
+    const videoList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(v => Url.Content("~/media/" + v.FileName)).ToList()));
+ </script>
+<script src="~/js/CustomJs.js"></script>
